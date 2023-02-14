@@ -30,8 +30,6 @@ class Register(db.Model):
     def password(self, password):
         self.password_hash = generate_password_hash(password)
     
-
-
 @app.route("/", methods=['Get', 'POST'])
 def index():
 
@@ -41,9 +39,12 @@ def index():
        email = request.form['email']
        contactno = request.form['contactno']
        set_password = request.form['password']
+
+       #set_password = str(set_password)
     #    c_pass = request.form['c_pass']
     
-       register = Register(fullname=fullname,username=username,
+       register = Register(fullname=fullname,
+    username=username,
     email=email,
     password=set_password,
     contactno=contactno)
@@ -55,13 +56,32 @@ def index():
 def login():
     if request.method=='POST':
         username = request.form['username']
+        # password = request.form['password']
+        # if username in Register and check_password_hash(Register[username],password):
+        #     return render_template("home.html")
+        a = None
+        pas = ""
+        a = Register.query.filter_by(username = username).first()
+        if a != None:
+            pas=a.password_hash
+        
+        #return f'{pas}'
+        # if(check_password_hash(password,pas)):
+        #     return render_template("home.html")
+        # else:
+        #     return f'error in if cond'
+
+        # Retrieve the hashed password from your database
+        #c = pas
         password = request.form['password']
-        user = Register.query.filter_by(username = username).first()
-        password_hash=user.password
-        if(check_password_hash(password,password_hash)):
+
+        if check_password_hash(pas, password):
+        # The password is correct
             return render_template("home.html")
         else:
+    # The password is incorrect
             return render_template("login.html")
+
     return render_template("login.html")
 
 with app.app_context():
